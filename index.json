@@ -47,11 +47,20 @@
       "versions": [
         {
           "version": "0.2.1",
-          "publishTimestamp": 1792652124,
+          "publishTimestamp": 1792652271,
           "source": {
             "type": "git",
             "url": "https://github.com/GitHub-lcb/dsh-plugin-env-doctor",
             "commit": "a6c6c557e58b3e9712bd2d0254b82827e1d5842b"
+          }
+        },
+        {
+          "version": "0.1.0",
+          "publishTimestamp": 1792649758,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/GitHub-lcb/dsh-plugin-env-doctor",
+            "commit": "a23771f650fba1241077e8d73d478a5d507036cf"
           }
         }
       ]

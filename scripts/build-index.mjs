@@ -9,6 +9,10 @@
  *
  * Without `--repository`, the URL is derived from `git remote get-url origin`.
  * The result is validated with the same rules a market reader applies.
+ *
+ * Released versions are kept, not replaced: the index is the only place a user
+ * can find an older version to fall back to, so regenerating it must never drop
+ * history. Re-running for an already published version is a no-op.
  */
 
 import { execFileSync } from 'node:child_process'
@@ -92,6 +96,39 @@ const keywords = (manifest.keywords ?? [])
   .filter((keyword) => keyword !== 'dsh' && keyword !== 'dsh-plugin')
   .map((keyword) => String(keyword))
 
+const output = resolve(root, args.out ?? 'index.json')
+
+/** The index as it stands, or nothing when this is the first build. */
+function readPrevious() {
+  try {
+    return JSON.parse(readFileSync(output, 'utf8'))
+  } catch {
+    return undefined
+  }
+}
+
+const previous = readPrevious()
+const previousPlugins = Array.isArray(previous?.plugins) ? previous.plugins : []
+const previousEntry = previousPlugins.find((entry) => entry?.name === manifest.name)
+const previousVersions = Array.isArray(previousEntry?.versions) ? previousEntry.versions : []
+
+// A version already published at this commit keeps its timestamp, so rebuilding
+// the index for an unrelated change does not rewrite history.
+const unchanged = previousVersions.find(
+  (entry) => entry?.version === manifest.version && entry?.source?.commit === commit,
+)
+const currentVersion = unchanged ?? {
+  version: manifest.version,
+  publishTimestamp: Math.floor(Date.now() / 1000),
+  source: { type: 'git', url: repository, commit },
+}
+
+// Newest first. Order is cosmetic: a reader sorts versions by SemVer precedence.
+const versions = [
+  currentVersion,
+  ...previousVersions.filter((entry) => entry?.version !== manifest.version),
+]
+
 const index = {
   format: 1,
   title: INDEX_TITLE,
@@ -107,17 +144,16 @@ const index = {
       homepage: repository,
       repository: { url: repository },
       metadata: { category: CATEGORY, keywords },
-      versions: [
-        {
-          version: manifest.version,
-          publishTimestamp: Math.floor(Date.now() / 1000),
-          source: { type: 'git', url: repository, commit },
-        },
-      ],
+      versions,
     },
+    ...previousPlugins.filter((entry) => entry?.name !== manifest.name),
   ],
 }
 
-const output = resolve(root, args.out ?? 'index.json')
 writeFileSync(output, `${JSON.stringify(index, null, 2)}\n`, 'utf8')
-process.stdout.write(`wrote ${output}\n  ${manifest.name}@${manifest.version} @ ${commit}\n  source: git ${repository}\n`)
+process.stdout.write(
+  `wrote ${output}\n` +
+    `  ${manifest.name}@${manifest.version} @ ${commit}${unchanged ? ' (unchanged)' : ''}\n` +
+    `  versions: ${versions.map((entry) => entry.version).join(', ')}\n` +
+    `  source: git ${repository}\n`,
+)
