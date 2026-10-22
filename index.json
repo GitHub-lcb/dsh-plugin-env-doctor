@@ -1,0 +1,60 @@
+{
+  "format": 1,
+  "title": {
+    "en": "LCB DSH Plugins",
+    "zh": "LCB DSH 插件"
+  },
+  "description": {
+    "en": "DeepSeek Harness plugins maintained by LCB.",
+    "zh": "LCB 维护的 DeepSeek Harness 插件。"
+  },
+  "metadata": {
+    "categories": {
+      "tooling": {
+        "title": {
+          "en": "Tooling",
+          "zh": "工具链"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-plugin-env-doctor",
+      "title": {
+        "en": "Environment Doctor",
+        "zh": "环境体检"
+      },
+      "description": {
+        "en": "Checks the local runtimes and CLIs a build or publish needs (Node.js, npm, pnpm, Git, GitHub CLI, Python) and the harness profile, then reports exactly what is missing.",
+        "zh": "检查本机运行时与命令行工具（Node.js、npm、pnpm、Git、GitHub CLI、Python）以及 Harness profile，直接报告缺了哪一项。"
+      },
+      "icon": "icon.svg",
+      "author": "lcb",
+      "homepage": "https://github.com/GitHub-lcb/dsh-plugin-env-doctor",
+      "repository": {
+        "url": "https://github.com/GitHub-lcb/dsh-plugin-env-doctor"
+      },
+      "metadata": {
+        "category": "tooling",
+        "keywords": [
+          "deepseek-harness",
+          "doctor",
+          "toolchain",
+          "diagnostics"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.1.0",
+          "publishTimestamp": 1792649758,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/GitHub-lcb/dsh-plugin-env-doctor",
+            "commit": "a23771f650fba1241077e8d73d478a5d507036cf"
+          }
+        }
+      ]
+    }
+  ]
+}
