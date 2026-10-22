@@ -79,7 +79,7 @@ env_doctor  timeoutMs: 10000
 - **Read-only and offline.** It runs fixed `<tool> --version` commands with a timeout and never executes project code, installs anything, or touches the network.
 - **No new session events.** Nothing is written to the session log; the tool returns a structured value and a rendered text report.
 - **Failures are classified, not guessed.** A missing executable (`command not found` / `不是内部或外部命令`), a timeout, and a non-zero exit are reported as `missing`, `failed`, and `failed` with the exit code respectively, so a broken install is not silently mistaken for an absent one.
-- **Host-only bundle.** No Client module: the capability is the tool, and it is useful to the agent as well as to a person reading the transcript. A custom tool card is a possible follow-up, not a requirement.
+- **A Host tool plus a Client card.** The tool is useful to the agent on its own; the Client half renders the same report as a checklist, so a person reading the transcript gets the status at a glance. The card parses the report the Host already writes, so neither half depends on the other's internals.
 
 ## Layout
 
@@ -90,8 +90,10 @@ index.js            the Host plugin: CHECKS table + env_doctor tool
 locale/en.json      Plugin Manager title and description
 locale/zh.json      same, in Chinese
 icon.svg            bundle icon
+client.js           the Client card, registered for tool.call.toolview
 index.json          generated plugin market index (format 1)
-scripts/build-index.mjs  regenerates index.json from package.json + git HEAD
+scripts/build-index.mjs  regenerates index.json, keeping released versions
+AGENTS.md           the plugin development playbook
 ```
 
 ## Releasing
@@ -107,6 +109,22 @@ git push
 ```
 
 Pass `--repository https://github.com/<owner>/<repo>` when `origin` is not set yet.
+
+## Updating
+
+There is no in-place upgrade action: a market reports `update-available`, and the update itself is an install. A same-named package replaces itself in place, so removing first is optional:
+
+```text
+plugin_manager  action: install_bundle  target: <the install target the index returns>
+```
+
+Restart the app when the Host half changed; reload the page when the Client half changed. Every released version stays in `index.json`, so an older one remains installable by its own pinned commit:
+
+```text
+plugin_market  action: list_versions  target: <index URL>  name: dsh-plugin-env-doctor
+```
+
+Version status in Discover comes from comparing the index against the profile, and the index document is cached for up to ten minutes — a fresh release can take that long to show up.
 
 ## License
 

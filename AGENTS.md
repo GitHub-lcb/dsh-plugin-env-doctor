@@ -202,6 +202,25 @@ node validate.mjs <index.json> <index 的 URL>
 
 `index.json` 钉的是具体 commit，所以**每次发布都要重新生成**，否则装到的是旧代码。
 
+### 更新：没有 update 动作
+
+`plugin_manager` 只有 install / remove / set，**没有 upgrade**。市场只会把"索引版本 > 已安装版本"标成 `update-available`，升级动作仍然是两条命令：
+
+```text
+plugin_manager  action: remove_bundle   target: <包名>
+plugin_manager  action: install_bundle  target: <索引返回的 install.target>
+```
+
+同名包直接重装也会**就地替换**（pnpm 输出 `- old / + new`，`application: applied`），不必先卸载。必须先卸载的只有两种情况：旧的是目录链接（Junction），或者要干净重来。装完宿主新代码要重启、客户端要刷新页面。
+
+### 缓存：改了索引 ≠ 立刻生效
+
+市场文档缓存 `cacheTtlMs` 默认 **10 分钟**。改完 `index.json` 后 `plugin_market` 仍可能返回旧内容，直到缓存过期或在 Discover 里点刷新。**判断发布是否成功要看源站**（直接请求索引 URL 看内容），不要看工具返回的版本号。
+
+### 历史版本必须保留
+
+索引是用户**唯一能回退**的地方。生成器要保留既有 `versions`：本项目 `scripts/build-index.mjs` 采用 append 语义，已发布版本保持 `publishTimestamp` 不变，所以重跑是幂等的。单版本索引看着干净，但用户装到坏版本时没有退路。
+
 ## 10. 交付前检查表
 
 - [ ] `node --check` 过全部 JS；`package.json` / locale 是合法 JSON
