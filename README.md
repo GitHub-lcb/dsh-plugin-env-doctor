@@ -51,6 +51,21 @@ plugin_manager  action: install_bundle  target: <absolute path to this directory
 plugin_manager  action: install_bundle  target: dsh-plugin-env-doctor
 ```
 
+### From the market index
+
+This repository publishes a [plugin market index](https://github.com/deepseek-ai/deepseek-harness) at `index.json`, so the plugin is installable without a checkout:
+
+1. Add the index URL once in **Settings → Plugins** (Discover), for example
+   `https://<owner>.github.io/dsh-plugin-env-doctor/index.json`.
+2. Then find and install it through the market:
+
+```text
+plugin_market   action: list_plugins  target: https://<owner>.github.io/dsh-plugin-env-doctor/index.json
+plugin_manager  action: install_bundle target: git+https://github.com/<owner>/dsh-plugin-env-doctor.git#<commit>
+```
+
+`index.json` pins an exact commit, so an install is reproducible; a stale index installs old code, which is why it is regenerated on every release.
+
 Then call the tool from any session:
 
 ```text
@@ -75,7 +90,23 @@ index.js            the Host plugin: CHECKS table + env_doctor tool
 locale/en.json      Plugin Manager title and description
 locale/zh.json      same, in Chinese
 icon.svg            bundle icon
+index.json          generated plugin market index (format 1)
+scripts/build-index.mjs  regenerates index.json from package.json + git HEAD
 ```
+
+## Releasing
+
+The market entry pins a commit, so rebuilding the index is part of every release:
+
+```bash
+git push
+node scripts/build-index.mjs          # reads the origin remote and HEAD
+git add index.json
+git commit -m "chore: refresh market index"
+git push
+```
+
+Pass `--repository https://github.com/<owner>/<repo>` when `origin` is not set yet.
 
 ## License
 
