@@ -1,16 +1,18 @@
 {
   "name": "dsh-plugin-env-doctor",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Local toolchain health check for DeepSeek Harness: reports which runtimes and CLIs are installed, their versions, and what is missing before a build or publish.",
   "type": "module",
   "license": "MIT",
   "exports": {
     ".": "./index.js",
+    "./client": "./client.js",
     "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg"
   },
   "files": [
     "index.js",
+    "client.js",
     "cordis.patch.yml",
     "locale/*.json",
     "icon.svg",
@@ -31,6 +33,11 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": ["@deepseek-ai/dsh-client-ui-conversation"]
     }
   }
 }
