@@ -106,20 +106,32 @@ window.__ModuleLoader__.load({
       return { rows, meta, cwd, summary }
     }
 
-    /** Active locale id, sniffed from the locale snapshot without assuming its fields. */
+    /** Active locale id, resolved defensively: the snapshot shape is not a public contract. */
     function useLanguage(ctx) {
       const subscribe = React.useCallback(
-        (notify) => (ctx.locale ? ctx.locale.subscribe(notify) : () => {}),
+        (notify) => {
+          try {
+            return ctx.locale ? ctx.locale.subscribe(notify) : () => {}
+          } catch {
+            return () => {}
+          }
+        },
         [ctx],
       )
       const read = React.useCallback(() => {
-        if (!ctx.locale) return 'en'
+        const isChinese = (value) => typeof value === 'string' && value.toLowerCase().startsWith('zh')
         try {
-          const snapshot = ctx.locale.getSnapshot() ?? {}
+          const snapshot = ctx.locale?.getSnapshot() ?? {}
           for (const key of ['locale', 'id', 'current', 'language', 'preferred']) {
             const value = snapshot[key]
-            if (typeof value === 'string' && value !== '') return value.toLowerCase().startsWith('zh') ? 'zh' : 'en'
+            if (typeof value === 'string' && value !== '') return isChinese(value) ? 'zh' : 'en'
           }
+        } catch {
+          /* fall through to the next signal */
+        }
+        try {
+          if (isChinese(globalThis.document?.documentElement?.lang)) return 'zh'
+          if (isChinese(globalThis.navigator?.language)) return 'zh'
         } catch {
           /* fall through to the default */
         }

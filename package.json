@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-env-doctor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Local toolchain health check for DeepSeek Harness: reports which runtimes and CLIs are installed, their versions, and what is missing before a build or publish.",
   "type": "module",
   "license": "MIT",
