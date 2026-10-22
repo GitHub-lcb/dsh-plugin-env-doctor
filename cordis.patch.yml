@@ -1,0 +1,3 @@
+- insert:
+    - id: env-doctor
+      name: dsh-plugin-env-doctor

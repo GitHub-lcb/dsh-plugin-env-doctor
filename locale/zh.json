@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "环境体检",
+    "description": "检查本机运行时与命令行工具（Node.js、npm、pnpm、Git、GitHub CLI、Python）以及 Harness profile，直接报告缺了哪一项。"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Environment Doctor",
+    "description": "Checks the local runtimes and CLIs a build or publish needs (Node.js, npm, pnpm, Git, GitHub CLI, Python) and the harness profile, then reports exactly what is missing."
+  }
+}
